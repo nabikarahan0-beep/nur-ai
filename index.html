@@ -130,7 +130,7 @@ const $=s=>document.querySelector(s);
 
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 async function api(p){const r=await fetch(API+p);if(!r.ok)throw new Error('Hata');return r.json()}
-function go(html){$('#app').innerHTML=html;window.scrollTo(0,0)}
+function render(html){$('#app').innerHTML=html;window.scrollTo(0,0)}
 
 /* ---------- SHELL / tabs ---------- */
 const TABS=['home','quran','explore','favs','profile'];
@@ -157,7 +157,7 @@ function todaysDate(){
 
 /* ---------- HOME ---------- */
 async function home(){
-  go(header('home')+`<div class="greet"><div class="kicker">${todaysDate()}</div><h2>Hoş geldin 👋</h2><p>Bugün Kur'an ile huzur bul.</p></div>
+  render(header('home')+`<div class="greet"><div class="kicker">${todaysDate()}</div><h2>Hoş geldin 👋</h2><p>Bugün Kur'an ile huzur bul.</p></div>
   <div class="spinner" id="load">Yükleniyor...<i></i></div>`);
   let vod=null;
   try{vod=await api('/verse-of-day')}catch(e){}
@@ -179,7 +179,7 @@ async function home(){
     <button class="ctrlBtn" style="margin-top:12px;background:#fff;color:var(--prim);border:none" onclick="readSurah(${vod.surahNumber},${vod.verseNumber})">Sureyi Oku</button></div>`;
   }
   html+=bottomNav('home');
-  go(html);
+  render(html);
 }
 /* ---------- QURAN LIST ---------- */
 let cachedSurahs=null;
@@ -197,17 +197,17 @@ async function quran(){
       <div class="smeta"><div class="an">${s.arabicName}</div><div class="tn">${s.turkishName}</div><div class="sub">${s.verseCount} ayet</div></div>
       <span class="badge">${s.revelationPlace}</span></div>`).join('')}</div>`;
   html+=bottomNav('quran');
-  go(html);
+  render(html);
 }
 async function listenSelect(){
   if(!cachedSurahs){try{cachedSurahs=(await api('/surahs')).items}catch(e){cachedSurahs=[]}}
   current=()=>listenSelect();
   let html=header('listen-select','Dinlemek İçin Seç')+`<div class="slist">${cachedSurahs.map(s=>`<div class="srow" onclick="listenSurah(${s.number})"><div class="snum">${s.number}</div><div class="smeta"><div class="tn">${s.turkishName}</div><div class="sub">${s.arabicName} • ${s.verseCount} ayet</div></div>🎧</div>`).join('')}</div>`+bottomNav('quran');
-  go(html);
+  render(html);
 }
 function surahMenu(n){
   const s=cachedSurahs.find(x=>x.number===n);
-  go(header('quran',s?s.turkishName:'Sure')+`
+  render(header('quran',s?s.turkishName:'Sure')+`
     <div class="grid" style="margin-top:10px">
       <button class="qcard" onclick="readSurah(${n})"><div class="ic">📖</div><div><b>Oku</b><span>Arapça + Meal</span></div></button>
       <button class="qcard" onclick="listenSurah(${n})"><div class="ic">🎧</div><div><b>Dinle</b><span>Sesle dinle</span></div></button>
@@ -216,9 +216,9 @@ function surahMenu(n){
 
 /* ---------- READ ---------- */
 async function readSurah(n,verse){
-  go(header('read',`Yükleniyor...`)+`<div class="spinner">Ayetler yükleniyor<i></i></div>`);
+  render(header('read',`Yükleniyor...`)+`<div class="spinner">Ayetler yükleniyor<i></i></div>`);
   let data;
-  try{data=await api(`/surahs/${n}/verses?limit=400`)}catch(e){go(header('read','Hata')+`<div class="empty">Ayetler yüklenemedi.</div>`);return}
+  try{data=await api(`/surahs/${n}/verses?limit=400`)}catch(e){render(header('read','Hata')+`<div class="empty">Ayetler yüklenemedi.</div>`);return}
   let fontPx=20;
   current=()=>readSurah(nUpdate);
   let nUpdate=n;
@@ -234,7 +234,7 @@ async function readSurah(n,verse){
       <button class="iconBtn" style="margin-left:auto" onclick="favVerse(${v.surahNumber},${v.verseNumber})">${state.favs.v.has(`${v.surahNumber}:${v.verseNumber}`)?'❤️':'🤍'}</button></div>
       <div class="arab" style="font-size:${fontPx}px">${v.arabicText}</div>
       ${window.fontToggle?`<div class="meal">${v.turkishTranslation}</div>`:''}</div>`).join('');
-    go(html);
+    render(html);
   }
   window.renderRead=render; window.fontToggle=true; render();
   if(verse){setTimeout(()=>{const el=[...document.querySelectorAll('.verse')].find(x=>x.querySelector('.vnum').textContent==String(verse));if(el)el.scrollIntoView({behavior:'smooth'})},300)}
@@ -243,7 +243,7 @@ async function readSurah(n,verse){
 /* ---------- LISTEN ---------- */
 let audioEl=null,currentSurah=null;
 async function listenSurah(n){
-  go(header('listen','Dinle')+`<div class="spinner">Ses hazırlanıyor<i></i></div>`);
+  render(header('listen','Dinle')+`<div class="spinner">Ses hazırlanıyor<i></i></div>`);
   const s=cachedSurahs.find(x=>x.number===n);
   currentSurah=n;
   stopAudio();
@@ -264,7 +264,7 @@ async function listenSurah(n){
       <button style="margin-top:14px;background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700" onclick="noteAyet()">Ayet bazlı dinleme yakında</button>
     </div>
     <div class="card"><h3>Ses kaynağı ve lisans</h3><p style="font-size:13px;color:var(--text2)">${rec.name} kıraati • Islamic Network CDN • Kullanım izni: Doğrulanmamış / Unverified</p></div>`+bottomNav('quran');
-    go(html);
+    render(html);
     audioEl.ontimeupdate=()=>{$('#fill').style.width=(audioEl.currentTime/(audioEl.duration||1)*100)+'%';$('#cur').textContent=fmt(audioEl.currentTime);$('#dur').textContent=fmt(audioEl.duration)};
     audioEl.play().then(()=>{state.playing=true}).catch(()=>toast('Ses yüklenemedi. Tekrar deneyin.'));
   }
@@ -292,11 +292,11 @@ function explore(){
   let html=header('explore','Keşfet')+`<div class="greet"><h2>Ruh hâline uygun ayetler</h2></div>
   ${CATS.map(c=>`<div class="cat" onclick="exploreCat('${c.id}','${c.name}')"><div class="ic">${c.ic}</div><div><b>${c.name}</b><div style="font-size:12px;color:var(--text2)">${c.desc}</div></div></div>`).join('')}`;
   html+=bottomNav('explore');
-  go(html);
+  render(html);
 }
 let catData={};
 async function exploreCat(id,name){
-  go(header('explore',name)+`<div class="spinner">Ayetler yükleniyor<i></i></div>`);
+  render(header('explore',name)+`<div class="spinner">Ayetler yükleniyor<i></i></div>`);
   let verses=[];
   try{const d=await api(`/mood-categories/${id}/verses`);verses=d.items||[]}catch(e){}
   const cat={
@@ -313,13 +313,13 @@ async function exploreCat(id,name){
     html+=verses.map(v=>`<div class="card"><div class="arab">${v.arabicText}</div><div class="meal">${v.turkishTranslation}</div><div class="ref">${v.surahTurkishName} • ${Number(v.surahNumber)}:${Number(v.verseNumber)}</div>
     <div style="display:flex;gap:8px;margin-top:10px"><button class="ctrlBtn" onclick="readSurah(${v.surahNumber},${v.verseNumber})">Oku</button><button class="ctrlBtn" onclick="listenSurah(${v.surahNumber})">🎧 Dinle</button></div></div>`).join('');
   }
-  html+=bottomNav('explore');go(html);
+  html+=bottomNav('explore');render(html);
 }
 
 /* ---------- SEARCH ---------- */
 async function searchScreen(){
   current=()=>searchScreen();
-  go(header('search','Ara')+`<div class="searchWrap"><input id="sq" placeholder="Sure veya ayet ara..." oninput="debSearch(this.value)"></div><div id="sres"></div>`+bottomNav('quran'));
+  render(header('search','Ara')+`<div class="searchWrap"><input id="sq" placeholder="Sure veya ayet ara..." oninput="debSearch(this.value)"></div><div id="sres"></div>`+bottomNav('quran'));
   $('#sq').focus();
 }
 let debT;
@@ -349,7 +349,7 @@ function favs(){
     if(state.favs.v.size)html+=`<div class="section">Ayetler</div>`;
     [...state.favs.v].forEach(k=>{const[sn,vn]=k.split(':');const s=cachedSurahs.find(x=>x.number==sn);html+=`<div class="favRow" onclick="readSurah(${sn},${vn})"><div><b>${s?s.turkishName:'Sure'} ${vn}</b></div><button class="iconBtn" style="margin-left:auto" onclick="event.stopPropagation();unfavV(${sn},${vn})">✕</button></div>`});
   }
-  html+=bottomNav('favs');go(html);
+  html+=bottomNav('favs');render(html);
 }
 function favVerse(sn,vn){const k=sn+':'+vn;if(state.favs.v.has(k)){state.favs.v.delete(k);toast('Favoriden çıkarıldı')}else{state.favs.v.add(k);toast('Favorilere eklendi ❤️')}readSurah(sn,vn)}
 function unfavS(n){state.favs.s.delete(n);favs()}
@@ -359,7 +359,7 @@ function favSurah(n){if(state.favs.s.has(n)){state.favs.s.delete(n)}else{state.f
 /* ---------- PROFILE ---------- */
 function profile(){
   current=()=>profile();
-  go(header('profile','Profil')+`
+  render(header('profile','Profil')+`
   <div class="card"><h3>Görünüm</h3>
     <div class="topTabs" style="padding:0"><button class="tabBtn ${theme==='light'?'on':''}" onclick="setTheme('light')">Açık</button><button class="tabBtn ${theme==='dark'?'on':''}" onclick="setTheme('dark')">Koyu</button></div></div>
   <div class="card"><h3>Hakkında</h3><p style="font-size:13px;color:var(--text2);line-height:1.6">NUR AI — Kur'an-ı Kerim uygulaması. Arapça metin Tanzil Uthmani, Türkçe meal Diyanet İşleri Başkanlığı kaynaklıdır. Ses kıraati: Mishary Alafasy ve Abdurrahman Es-Sudais.</p>
