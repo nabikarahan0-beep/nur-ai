@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NUR AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Nunito:wght@400;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F8F7F2; --bg2:#EDE9DF; --card:#FFFFFF; --prim:#123C35; --sec:#286B57;
+  --acc:#C8A96B; --text:#252A27; --text2:#707873; --div:#E6E8E3;
+  --err:#B54747; --suc:#26734D;
+}
+[data-theme="dark"]{
+  --bg:#111916; --bg2:#0D1410; --card:#1B2520; --prim:#286B57; --sec:#3A8A6E;
+  --acc:#D0B47A; --text:#F4F4EF; --text2:#B5C0B8; --div:#303A34
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);min-height:100vh;transition:.3s}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.hidden{display:none!important}
+#app{max-width:640px;margin:0 auto;min-height:100vh;padding-bottom:30px}
+header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg) 60%,transparent);padding:16px 20px 8px;backdrop-filter:blur(6px)}
+.headRow{display:flex;align-items:center;gap:10px}
+.logo{display:flex;align-items:center;gap:8px}
+.logoMark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--prim),var(--sec));display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px}
+.logoText{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:var(--prim)}
+[data-theme="dark"] .logoText{color:var(--sec)}
+.dateTxt{margin-left:auto;font-size:12px;color:var(--text2)}
+.iconBtn{background:transparent;border:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:18px}
+.iconBtn:hover{background:var(--div)}
+.hdr{display:flex;align-items:center;gap:12px;padding:14px 20px}
+.hdr h1{font-family:'Playfair Display',serif;font-size:22px;color:var(--text)}
+.greet{padding:4px 20px 16px}
+.greet h2{font-family:'Playfair Display',serif;font-size:21px}
+.greet p{color:var(--text2);font-size:14px;margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px}
+.qcard{background:var(--card);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;border:1px solid var(--div);transition:.2s;text-align:left}
+.qcard:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.qcard .ic{width:40px;height:40px;border-radius:12px;background:rgba(40,107,87,.12);color:var(--prim);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+[data-theme="dark"] .qcard .ic{color:var(--sec)}
+.qcard b{font-size:14px;display:block}
+.qcard span{font-size:12px;color:var(--text2)}
+.card{background:var(--card);border-radius:14px;padding:18px;margin:14px 20px;border:1px solid var(--div)}
+.card h3{font-size:15px;margin-bottom:8px;color:var(--text)}
+.verseOfDay{background:linear-gradient(135deg,var(--prim),var(--sec));color:#fff;border:none}
+.verseOfDay h3{color:#fff}
+.arab{font-family:'Amiri',serif;direction:rtl;font-size:20px;line-height:2;text-align:right}
+.meal{font-size:14px;color:var(--text2);margin-top:6px}
+[data-theme="dark"] .verseOfDay .meal{color:#DCE8E0}
+.ref{color:var(--acc);font-size:12px;margin-top:8px;font-weight:700}
+.topTabs{display:flex;gap:8px;padding:6px 20px 14px}
+.tabBtn{flex:1;padding:10px;border-radius:12px;border:1px solid var(--div);background:var(--card);color:var(--text2);font-weight:700;font-size:13px;transition:.2s}
+.tabBtn.on{background:var(--prim);color:#fff;border-color:var(--prim)}
+/* list */
+.slist{display:flex;flex-direction:column;gap:8px;padding:0 20px}
+.srow{background:var(--card);border:1px solid var(--div);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:.15s}
+.srow:hover{background:rgba(200,169,107,.08)}
+.snum{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--prim),var(--sec));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
+.smeta{flex:1}
+.smeta .an{font-family:'Amiri',serif;font-size:18px;direction:rtl}
+.smeta .tn{font-weight:700;font-size:14px}
+.smeta .sub{font-size:12px;color:var(--text2)}
+.badge{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(200,169,107,.18);color:var(--acc);font-weight:800}
+/* read */
+.verse{border:1px solid var(--div);border-radius:14px;padding:16px;margin:12px 20px;background:var(--card)}
+.vHdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.vnum{width:30px;height:30px;border-radius:50%;background:rgba(200,169,107,.2);color:var(--acc);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.controls{display:flex;align-items:center;gap:8px;margin:12px 20px}
+.ctrlBtn{padding:8px 14px;border-radius:10px;border:1px solid var(--div);background:var(--card);font-weight:700;font-size:13px;color:var(--text)}
+.ctrlBtn.act{background:var(--prim);color:#fff;border-color:var(--prim)}
+/* audio */
+.player{background:linear-gradient(135deg,var(--prim),var(--sec));border-radius:18px;padding:24px 20px;margin:16px 20px;color:#fff;text-align:center}
+.player .an{font-family:'Amiri',serif;font-size:28px;direction:rtl}
+.player .tn{font-size:18px;font-weight:800;margin-top:2px}
+.player small{display:block;color:#CFE0D8;margin-top:4px}
+.progress{height:6px;background:rgba(255,255,255,.25);border-radius:6px;margin:18px 0 10px;cursor:pointer;position:relative}
+.progress .fill{height:100%;background:var(--acc);border-radius:6px;width:0}
+.timeRow{display:flex;justify-content:space-between;font-size:12px;color:#CFE0D8}
+.pCtrls{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:16px}
+.pBtn{border:none;background:transparent;color:#fff;font-size:22px}
+.pBtn.main{width:60px;height:60px;border-radius:50%;background:#fff;color:var(--prim);font-size:24px;display:flex;align-items:center;justify-content:center}
+.recRow{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.recBtn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700}
+.recBtn.on{background:var(--acc);color:#123C35}
+/* search */
+.searchWrap{padding:8px 20px}
+.searchWrap input{width:100%;padding:13px 16px;border-radius:12px;border:1px solid var(--div);background:var(--card);font-size:15px;color:var(--text);outline:none}
+.searchWrap input:focus{border-color:var(--sec)}
+.section{font-size:13px;font-weight:800;color:var(--text2);padding:12px 20px 8px;letter-spacing:.3px}
+.vres{background:var(--card);border:1px solid var(--div);border-radius:12px;padding:12px 14px;margin:6px 20px;cursor:pointer}
+.vres:hover{background:rgba(200,169,107,.08)}
+.vres .arab{font-size:16px}
+/* categories */
+.cat{background:var(--card);border:1px solid var(--div);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;margin:8px 20px}
+.cat:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.cat .ic{width:40px;height:40px;border-radius:12px;background:rgba(200,169,107,.2);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:18px}
+/* favorites */
+.favRow{background:var(--card);border:1px solid var(--div);border-radius:12px;padding:12px 14px;margin:8px 20px;display:flex;align-items:center;gap:12px;cursor:pointer}
+/* toast */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#252A27;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;z-index:100;pointer-events:none;max-width:90%}
+#toast.show{opacity:1}
+.bismillah{font-family:'Amiri',serif;direction:rtl;text-align:center;font-size:20px;color:var(--prim);margin:14px 20px;padding:12px;background:rgba(200,169,107,.1);border-radius:12px}
+[data-theme="dark"] .bismillah{color:var(--sec)}
+.kicker{font-size:12px;color:var(--text2);letter-spacing:.5px;margin-bottom:4px}
+.backBtn{font-size:22px;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.empty{text-align:center;color:var(--text2);padding:50px 20px;font-size:14px}
+.spinner{text-align:center;padding:40px;color:var(--text2)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner i{display:inline-block;width:30px;height:30px;border:3px solid var(--div);border-top-color:var(--sec);border-radius:50%;animation:spin .8s linear infinite}
+.themeToggle{font-size:16px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<script>
+const API='https://nur-ai-mobile-48pya8.abacusai.app/api';
+const RECITERS=[
+ {id:'re-c1',name:'Mishary Alafasy',key:'ar.alafasy'},
+ {id:'re-c2',name:'Abdurrahman Es-Sudais',key:'ar.abdurrahmaansudais'}
+];
+const state={surahs:[],reciter:0,audio:null,playing:false,curAudio:null,favs:{s:new Set(),v:new Set()}};
+let theme=localStorage.getItem('nurtheme')||'light';
+document.documentElement.setAttribute('data-theme',themeged());
+function themeged(){return theme}
+const $=s=>document.querySelector(s);
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+async function api(p){const r=await fetch(API+p);if(!r.ok)throw new Error('Hata');return r.json()}
+function go(html){$('#app').innerHTML=html;window.scrollTo(0,0)}
+
+/* ---------- SHELL / tabs ---------- */
+const TABS=['home','quran','explore','favs','profile'];
+function header(active,title){
+  return `<header>
+    <div class="headRow">
+      <div class="logo"><div class="logoMark">﷽</div><div class="logoText">NUR AI</div></div>
+      <span class="dateTxt">${todaysDate()}</span>
+      <button class="iconBtn themeToggle" onclick="toggleTheme()">${theme==='dark'?'☀️':'🌙'}</button>
+    </div>
+    ${title?`<div class="hdr"><button class="iconBtn backBtn" onclick="go('${active}')">‹</button><h1>${title}</h1></div>`:''}
+  </header>`;
+}
+function bottomNav(active){
+  const icons={home:'🏠',quran:'📖',explore:'🧭',favs:'❤️',profile:'👤'};
+  return `<nav style="position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--div);display:flex;max-width:640px;margin:0 auto;z-index:50">
+    ${TABS.map(t=>`<button onclick="go('${t}')" style="flex:1;padding:10px 0;background:transparent;border:none;color:${t===active?'var(--acc)':'var(--text2)'};font-size:20px">${icons[t]}<div style="font-size:9px;font-weight:700">${'Ana Sayfa, Kur'an, Keşfet, Favoriler, Profil'.split(',')[TABS.indexOf(t)]}</div></button>`).join('')}
+  </nav>`;
+}
+function todaysDate(){
+  const d=new Date();
+  return d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+}
+
+/* ---------- HOME ---------- */
+async function home(){
+  go(header('home')+`<div class="greet"><div class="kicker">${todaysDate()}</div><h2>Hoş geldin 👋</h2><p>Bugün Kur'an ile huzur bul.</p></div>
+  <div class="spinner" id="load">Yükleniyor...<i></i></div>`);
+  let vod=null;
+  try{vod=await api('/verse-of-day')}catch(e){}
+  const cards=[
+    ['Kur'an Dinle','🎧',()=>go('listen-select')],
+    ['Kur'an Oku','📖',()=>go('quran')],
+    ['Ruh Hâlime Uygun','❤️',()=>go('explore')],
+    ['Sure ve Ayet Ara','🔍',()=>searchScreen()],
+    ['Favorilerim','⭐',()=>go('favs')],
+    ['Sureler','📜',()=>go('quran')]
+  ];
+  let html=header('home')+`<div class="greet"><div class="kicker">${todaysDate()}</div><h2>Hoş geldin 👋</h2><p>Bugün Kur'an ile huzur bul.</p></div>
+  <div class="grid">${cards.map(c=>`<button class="qcard" onclick="(${c[2].toString()})()"><div class="ic">${c[1]}</div><div><b>${c[0]}</b></div></button>`).join('')}</div>`;
+  if(vod){
+    html+=`<div class="card verseOfDay"><div class="kicker" style="color:#D0B47A">GÜNÜN AYETİ</div>
+    <div class="arab">${vod.arabicText}</div>
+    <div class="meal">${vod.turkishTranslation} <small style="display:block;opacity:.85">(${vod.translationSource})</small></div>
+    <div class="ref">${vod.surahArabicName} • ${Number(vod.surahNumber)}:${Number(vod.verseNumber)}</div>
+    <button class="ctrlBtn" style="margin-top:12px;background:#fff;color:var(--prim);border:none" onclick="readSurah(${vod.surahNumber},${vod.verseNumber})">Sureyi Oku</button></div>`;
+  }
+  html+=bottomNav('home');
+  go(html);
+}
+/* ---------- QURAN LIST ---------- */
+let cachedSurahs=null;
+async function quran(){
+  if(!cachedSurahs){try{cachedSurahs=(await api('/surahs')).items}catch(e){cachedSurahs=[]}}
+  current=()=>quran();
+  let html=header('quran','Kur'an-ı Kerim')+`<div class="topTabs">
+    <button class="tabBtn on" onclick="quran()">Sure Listesi</button>
+    <button class="tabBtn" onclick="go('listen-select')">Dinle</button>
+    <button class="tabBtn" onclick="searchScreen()">Ara</button></div>`;
+  if(cachedSurahs.length===0)html+=`<div class="empty">Sureler yüklenemedi.</div>`;
+  else html+=`<div class="slist">${cachedSurahs.map(s=>`
+    <div class="srow" onclick="surahMenu(${s.number})">
+      <div class="snum">${s.number}</div>
+      <div class="smeta"><div class="an">${s.arabicName}</div><div class="tn">${s.turkishName}</div><div class="sub">${s.verseCount} ayet</div></div>
+      <span class="badge">${s.revelationPlace}</span></div>`).join('')}</div>`;
+  html+=bottomNav('quran');
+  go(html);
+}
+async function listenSelect(){
+  if(!cachedSurahs){try{cachedSurahs=(await api('/surahs')).items}catch(e){cachedSurahs=[]}}
+  current=()=>listenSelect();
+  let html=header('listen-select','Dinlemek İçin Seç')+`<div class="slist">${cachedSurahs.map(s=>`<div class="srow" onclick="listenSurah(${s.number})"><div class="snum">${s.number}</div><div class="smeta"><div class="tn">${s.turkishName}</div><div class="sub">${s.arabicName} • ${s.verseCount} ayet</div></div>🎧</div>`).join('')}</div>`+bottomNav('quran');
+  go(html);
+}
+function surahMenu(n){
+  const s=cachedSurahs.find(x=>x.number===n);
+  go(header('quran',s?s.turkishName:'Sure')+`
+    <div class="grid" style="margin-top:10px">
+      <button class="qcard" onclick="readSurah(${n})"><div class="ic">📖</div><div><b>Oku</b><span>Arapça + Meal</span></div></button>
+      <button class="qcard" onclick="listenSurah(${n})"><div class="ic">🎧</div><div><b>Dinle</b><span>Sesle dinle</span></div></button>
+    </div>`+bottomNav('quran'));
+}
+
+/* ---------- READ ---------- */
+async function readSurah(n,verse){
+  go(header('read',`Yükleniyor...`)+`<div class="spinner">Ayetler yükleniyor<i></i></div>`);
+  let data;
+  try{data=await api(`/surahs/${n}/verses?limit=400`)}catch(e){go(header('read','Hata')+`<div class="empty">Ayetler yüklenemedi.</div>`);return}
+  let fontPx=20;
+  current=()=>readSurah(nUpdate);
+  let nUpdate=n;
+  const title=data.surah?`${data.surah.turkishName}`:`Sure ${n}`;
+  function render(){
+    let html=header('read',title)+`<div class="controls">
+      <button class="ctrlBtn" onclick="readSurah(${n})">Font ${fontPx}px</button>
+      <button class="ctrlBtn act" onclick="window.fontToggle=!window.fontToggle;renderRead()">Meal ${window.fontToggle?'Göster':'Gizle'}</button>
+      <button class="ctrlBtn" onclick="listenSurah(${n})">🎧 Dinle</button></div>`;
+    if(n!==9)html+=`<div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`;
+    const items=data.items||[];
+    html+=items.map(v=>`<div class="verse"><div class="vHdr"><div class="vnum">${v.verseNumber}</div>
+      <button class="iconBtn" style="margin-left:auto" onclick="favVerse(${v.surahNumber},${v.verseNumber})">${state.favs.v.has(`${v.surahNumber}:${v.verseNumber}`)?'❤️':'🤍'}</button></div>
+      <div class="arab" style="font-size:${fontPx}px">${v.arabicText}</div>
+      ${window.fontToggle?`<div class="meal">${v.turkishTranslation}</div>`:''}</div>`).join('');
+    go(html);
+  }
+  window.renderRead=render; window.fontToggle=true; render();
+  if(verse){setTimeout(()=>{const el=[...document.querySelectorAll('.verse')].find(x=>x.querySelector('.vnum').textContent==String(verse));if(el)el.scrollIntoView({behavior:'smooth'})},300)}
+}
+
+/* ---------- LISTEN ---------- */
+let audioEl=null,currentSurah=null;
+async function listenSurah(n){
+  go(header('listen','Dinle')+`<div class="spinner">Ses hazırlanıyor<i></i></div>`);
+  const s=cachedSurahs.find(x=>x.number===n);
+  currentSurah=n;
+  stopAudio();
+  const rec=RECITERS[state.reciter];
+  const url=`https://cdn.islamic.network/quran/audio-surah/128/${rec.key}/${n}.mp3`;
+  audioEl=new Audio(url);
+  audioEl.preload='metadata';
+  function render(){
+    let html=header('listen',s?s.turkishName:'Sure')+`<div class="player">
+      <div class="an">${s? s.arabicName:''}</div><div class="tn">${s? s.turkishName:''}</div>
+      <small>${rec.name}</small>
+      <div class="progress" id="prog" onclick="seek(event)"><div class="fill" id="fill"></div></div>
+      <div class="timeRow"><span id="cur">0:00</span><span id="dur">--:--</span></div>
+      <div class="pCtrls">
+        <button class="pBtn" onclick="togglePlay()">${state.playing?'⏸':'▶'}</button>
+      </div>
+      <div class="recRow">${RECITERS.map((r,i)=>`<button class="recBtn ${i===state.reciter?'on':''}" onclick="selecReciter(${i})">${r.name}</button>`).join('')}</div>
+      <button style="margin-top:14px;background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700" onclick="noteAyet()">Ayet bazlı dinleme yakında</button>
+    </div>
+    <div class="card"><h3>Ses kaynağı ve lisans</h3><p style="font-size:13px;color:var(--text2)">${rec.name} kıraati • Islamic Network CDN • Kullanım izni: Doğrulanmamış / Unverified</p></div>`+bottomNav('quran');
+    go(html);
+    audioEl.ontimeupdate=()=>{$('#fill').style.width=(audioEl.currentTime/(audioEl.duration||1)*100)+'%';$('#cur').textContent=fmt(audioEl.currentTime);$('#dur').textContent=fmt(audioEl.duration)};
+    audioEl.play().then(()=>{state.playing=true}).catch(()=>toast('Ses yüklenemedi. Tekrar deneyin.'));
+  }
+  window.selecReciter=i=>{state.reciter=i;listenSurah(n)};
+  window.noteAyet=()=>toast('Ayet bazlı dinleme yakında gelecek');
+  current=()=>listenSurah(n);
+  render();
+}
+function fmt(s){s=Math.floor(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function togglePlay(){if(!audioEl)return;if(state.playing){audioEl.pause();state.playing=false}else{audioEl.play();state.playing=true}listenSurah(currentSurah)}
+function stopAudio(){if(audioEl){audioEl.pause();audioEl=null}}
+function seek(e){if(!audioEl||!audioEl.duration)return;const r=e.currentTarget.getBoundingClientRect();audioEl.currentTime=((e.clientX-r.left)/r.width)*audioEl.duration}
+
+/* ---------- EXPLORE ---------- */
+const CATS=[
+ {id:'c1',ic:'🍃',name:'Huzur Bulmak',desc:'Sakinliğe ulaşmak için ayetler'},
+ {id:'c2',ic:'🕊️',name:'Kaygı ve Teselli',desc:'Endişe anlarında ferahlık'},
+ {id:'c3',ic:'🌅',name:'Umut Veren Ayetler',desc:'Ümide tutunan ayetler'},
+ {id:'c4',ic:'🌙',name:'Uyku Öncesi',desc:'Huzurlu bir gece için'},
+ {id:'c5',ic:'🌤️',name:'Sakin Bir Gün',desc:'Güne güzel başlangıç'},
+ {id:'c6',ic:'🤲',name:'Şükür ve Sabır',desc:'Şükür ve sabır ayetleri'}
+];
+function explore(){
+  current=()=>explore();
+  let html=header('explore','Keşfet')+`<div class="greet"><h2>Ruh hâline uygun ayetler</h2></div>
+  ${CATS.map(c=>`<div class="cat" onclick="exploreCat('${c.id}','${c.name}')"><div class="ic">${c.ic}</div><div><b>${c.name}</b><div style="font-size:12px;color:var(--text2)">${c.desc}</div></div></div>`).join('')}`;
+  html+=bottomNav('explore');
+  go(html);
+}
+let catData={};
+async function exploreCat(id,name){
+  go(header('explore',name)+`<div class="spinner">Ayetler yükleniyor<i></i></div>`);
+  let verses=[];
+  try{const d=await api(`/mood-categories/${id}/verses`);verses=d.items||[]}catch(e){}
+  const cat={
+    'c1':['Yasadığınız gibi siz de yaşarsınız','İçinizdeki huzuru bulun','Rabbinize tevekkül edin','Sabredenlerle beraberdir Allah'],
+    'c2':['Bilesiniz ki kalpler ancak Allah-zikri ile huzur bulur (13:28)','Allah her zorlukla beraber bir kolaylık verir (94:6)','Şüphesiz yardım Allah'tandır'],
+    'c3':['Allah'ın rahmetinden ümit kesmeyin (39:53)','Şüphesiz zorlukla beraber kolaylık vardır (94:5)','Allah size kolaylık diler (2:185)'],
+    'c4':['Geceyi sizin için dinlenme yaptı (25:47)','Uykuyu sizin için dinlenme kıldık (78:9)'],
+    'c5':['Sabahı aydınlatan O'dur (6:96)','Sabret, güzel olan sonuçtur'],
+    'c6':['Şükrederseniz artırırım (14:7)','Sabredenler mükafatlarını alır (39:10)']
+  };
+  let html=header('explore',name)+`<div class="greet"><p>${cat[id]?cat[id].slice(0,2).map(x=>'• '+x).join('<br>'):''}</p></div>`;
+  if(verses.length===0){html+=`<div class="empty">Bu kategoride gösterilecek ayetler yüklenemedi. Aşağıdaki hazır ayetleri inceleyebilirsiniz.<br><br>${(cat[id]||[]).map(x=>x).join('<br>')}</div>`}
+  else{
+    html+=verses.map(v=>`<div class="card"><div class="arab">${v.arabicText}</div><div class="meal">${v.turkishTranslation}</div><div class="ref">${v.surahTurkishName} • ${Number(v.surahNumber)}:${Number(v.verseNumber)}</div>
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="ctrlBtn" onclick="readSurah(${v.surahNumber},${v.verseNumber})">Oku</button><button class="ctrlBtn" onclick="listenSurah(${v.surahNumber})">🎧 Dinle</button></div></div>`).join('');
+  }
+  html+=bottomNav('explore');go(html);
+}
+
+/* ---------- SEARCH ---------- */
+async function searchScreen(){
+  current=()=>searchScreen();
+  go(header('search','Ara')+`<div class="searchWrap"><input id="sq" placeholder="Sure veya ayet ara..." oninput="debSearch(this.value)"></div><div id="sres"></div>`+bottomNav('quran'));
+  $('#sq').focus();
+}
+let debT;
+function debSearch(q){
+  clearTimeout(debT);debT=setTimeout(()=>doSearch(q),300);
+}
+async function doSearch(q){
+  if(!q||q.length<2){$('#sres').innerHTML='';return}
+  $('#sres').innerHTML='<div class="spinner">Aranıyor<i></i></div>';
+  let d;
+  try{d=await api(`/search?q=${encodeURIComponent(q)}`)}catch(e){$('#sres').innerHTML='<div class="empty">Sonuç bulunamadı</div>';return}
+  let html='';
+  if(d.surahs&&d.surahs.length){html+=`<div class="section">Sureler</div>`+d.surahs.map(s=>`<div class="cat" onclick="readSurah(${s.number})"><div class="ic">📖</div><b>${s.turkishName}</b></div>`).join('')}
+  if(d.verses&&d.verses.length){html+=`<div class="section">Ayetler</div>`+d.verses.map(v=>`<div class="vres" onclick="readSurah(${v.surahNumber},${v.verseNumber})"><div class="arab">${v.arabicText}</div><div class="meal">${v.matchSnippet||v.turkishTranslation}</div><div class="ref">${v.surahTurkishName} • ${Number(v.surahNumber)}:${Number(v.verseNumber)}</div></div>`).join('')}
+  if(!html)html='<div class="empty">Sonuç bulunamadı</div>';
+  $('#sres').innerHTML=html;
+}
+
+/* ---------- FAVORITES ---------- */
+function favs(){
+  current=()=>favs();
+  let html=header('favs','Favorilerim');
+  if(state.favs.s.size===0&&state.favs.v.size===0){html+=`<div class="empty">Henüz favori eklemediniz 🤍<br><br><button class="ctrlBtn" onclick="go('quran')">Surelere Göz At</button></div>`}
+  else{
+    if(state.favs.s.size)html+=`<div class="section">Sureler</div>`;
+    [...state.favs.s].forEach(n=>{const s=cachedSurahs.find(x=>x.number==n);if(s)html+=`<div class="favRow" onclick="readSurah(${s.number})"><div class="snum">${s.number}</div><div><b>${s.turkishName}</b></div><button class="iconBtn" style="margin-left:auto" onclick="event.stopPropagation();unfavS(${n})">✕</button></div>`});
+    if(state.favs.v.size)html+=`<div class="section">Ayetler</div>`;
+    [...state.favs.v].forEach(k=>{const[sn,vn]=k.split(':');const s=cachedSurahs.find(x=>x.number==sn);html+=`<div class="favRow" onclick="readSurah(${sn},${vn})"><div><b>${s?s.turkishName:'Sure'} ${vn}</b></div><button class="iconBtn" style="margin-left:auto" onclick="event.stopPropagation();unfavV(${sn},${vn})">✕</button></div>`});
+  }
+  html+=bottomNav('favs');go(html);
+}
+function favVerse(sn,vn){const k=sn+':'+vn;if(state.favs.v.has(k)){state.favs.v.delete(k);toast('Favoriden çıkarıldı')}else{state.favs.v.add(k);toast('Favorilere eklendi ❤️')}readSurah(sn,vn)}
+function unfavS(n){state.favs.s.delete(n);favs()}
+function unfavV(sn,vn){state.favs.v.delete(sn+':'+vn);favs()}
+function favSurah(n){if(state.favs.s.has(n)){state.favs.s.delete(n)}else{state.favs.s.add(n)}}
+
+/* ---------- PROFILE ---------- */
+function profile(){
+  current=()=>profile();
+  go(header('profile','Profil')+`
+  <div class="card"><h3>Görünüm</h3>
+    <div class="topTabs" style="padding:0"><button class="tabBtn ${theme==='light'?'on':''}" onclick="setTheme('light')">Açık</button><button class="tabBtn ${theme==='dark'?'on':''}" onclick="setTheme('dark')">Koyu</button></div></div>
+  <div class="card"><h3>Hakkında</h3><p style="font-size:13px;color:var(--text2);line-height:1.6">NUR AI — Kur'an-ı Kerim uygulaması. Arapça metin Tanzil Uthmani, Türkçe meal Diyanet İşleri Başkanlığı kaynaklıdır. Ses kıraati: Mishary Alafasy ve Abdurrahman Es-Sudais.</p>
+  <p style="font-size:12px;color:var(--text2);margin-top:10px">Bu web sürümü misafir kullanım içindir. Hesap, abonelik ve çevrimdışı ses özellikleri mobil uygulamaya aittir.</p></div>
+  <div class="card"><h3>Kur'an Kaynakları</h3>
+    <p style="font-size:13px;color:var(--text2)">Meal: Diyanet İşleri Başkanlığı • Arapça: Tanzil Uthmani • API: Quran.com v4</p></div>`+bottomNav('profile'));
+}
+function toggleTheme(){theme=theme==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('nurtheme',theme);if(current)current()}
+function setTheme(t){theme=t;document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('nurtheme',theme);profile()}
+
+/* routing */
+let current=null;
+function go(name){switch(name){
+  case 'home':home();break;
+  case 'quran':quran();break;
+  case 'explore':explore();break;
+  case 'favs':favs();break;
+  case 'profile':profile();break;
+  case 'listen-select':listenSelect();break;
+  case 'search':searchScreen();break;
+  default:home();
+}}
+go('home');
+</script>
+</body>
+</html>
